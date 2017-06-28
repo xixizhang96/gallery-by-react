@@ -49,6 +49,20 @@ let get30DegRandom = () => {
 
 //单个图片组件
 class ImgFigure extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this); //绑定this
+  }
+
+  /*
+   * ImgFigure的点击处理函数
+   */
+  handleClick(e) {
+    this.props.inverse();
+
+    e.stopPropagation();
+    e.preventDefault();
+  }
 
   render() {
 
@@ -59,12 +73,26 @@ class ImgFigure extends React.Component {
       styleObj = this.props.arrange.pos;
     }
 
+    //如果图片的旋转角度有值并且不为0，添加旋转角度
+    if (this.props.arrange.rotate) {
+      ['-moz-', '-ms', '-webkit-', ''].forEach((value) => {
+        styleObj[value + 'transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
+      });
+    }
+
+    //提取出className名
+    let imgFigureClassName = 'img-figure';
+    imgFigureClassName += this.props.arrange.isInverse ? ' is-inverse' : '';
+
     return (
-      <figure className="img-figure" style = { styleObj }>
+      <figure className={imgFigureClassName} style = { styleObj } onClick={this.handleClick}>
         <img src={this.props.data.imageURL}
              alt={this.props.data.title}/>
         <figcaption>
           <h2 className="img-title">{this.props.data.title}</h2>
+          <div className="img-back" onClick={this.handleClick}>
+            <p>{this.props.data.desc}</p>
+          </div>
         </figcaption>
       </figure>
     );
@@ -116,9 +144,28 @@ class AppComponent extends React.Component {
         //     top: '0'
         //   },
         //   rotate: 0 //旋转角度
+        // isInverse: false //表示图片正反面
         // }
       ]
     };
+  }
+
+  /*
+   *翻转图片
+   *@parma index 这里设计一个闭包函数，通过闭包变量来缓存当前被执行isInverse操作的图片对应图片信息数组的index值
+   *@return {Function} 这是一个闭包函数，其内retun一个真正待被执行的函数
+   *@闭包 -- 就是能够读取其它函数内部变量的函数(简单理解为定义在函数内部的函数)
+   */
+  inverse(index) {
+    return () => {
+      let imgsArrangArr = this.state.imgsArrangeArr;
+      imgsArrangArr[index].isInverse = !imgsArrangArr[index].isInverse;
+
+      //调用大管家的setState，触发视图的重新渲染
+      this.setState({
+        imgsArrangeArr: imgsArrangArr
+      });
+    }
   }
 
 
@@ -280,12 +327,13 @@ class AppComponent extends React.Component {
             left: 0,
             top: 0
           },
-          rotate: 0
+          rotate: 0,
+          isInverse: false
         }
       }
       //要给每个图片加上ref属性，不然会出现找不到舞台宽度的情况
       imgFigures.push(<ImgFigure data={value} key={index} ref={'imgFigure'+index}
-                                 arrange={this.state.imgsArrangeArr[index]}/>);
+                                 arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)}/>);
     });
 
     return (
