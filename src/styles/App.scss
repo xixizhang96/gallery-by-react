@@ -28,6 +28,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   background-color: #ddd;
+  perspective: 1800px;
 
   @at-root {
     .img-figure {
@@ -39,11 +40,12 @@ html, body {
       cursor: pointer;
       background-color: #fff;
       box-sizing: border-box;
+      transform-origin: 0 50% 0; //transform-origin: 50% 50% 0; -- 这个是她的默认值，三个值分别表示x轴原点;y轴原点;z轴原点
       transform-style: preserve-3d;
       transition: transform .6s ease-in-out, left .6s ease-in-out, top .6s ease-in-out;
 
       &.is-inverse {
-        transform: rotateY(180deg);
+        transform: translate(320px) rotateY(180deg);
       }
     }
 
