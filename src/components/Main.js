@@ -109,6 +109,32 @@ class ImgFigure extends React.Component {
 }
 
 /*
+ *实现控制组件，创建对应的React.Component
+ */
+class ControllerUnit extends React.Component {
+  /*
+   * ControllerUnit的点击处理函数
+   */
+  handleClick(e) {
+
+    if (this.props.arrange.isCenter) {
+      this.props.inverse();
+    } else {
+      this.props.center();
+    }
+
+    e.stopPropagation();
+    e.preventDefault();
+  }
+
+  render() {
+    return (
+      <span className="controller-unit" onClick={this.handleClick}></span>
+    );
+  }
+}
+
+/*
  *每一个使用class方式定义的类默认都有一个constructor函数，这个函数是构造函数的主函数，该函数体内部的this指向生成的实例
  */
 class AppComponent extends React.Component {
@@ -359,6 +385,7 @@ class AppComponent extends React.Component {
       //要给每个图片加上ref属性，不然会出现找不到舞台宽度的情况
       imgFigures.push(<ImgFigure data={value} key={index} ref={'imgFigure'+index}
                                  arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
+      controllerUnits.push(<ControllerUnit/>);
     });
 
     return (
