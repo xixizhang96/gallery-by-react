@@ -80,8 +80,8 @@ class ImgFigure extends React.Component {
 
     //如果图片的旋转角度有值并且不为0，添加旋转角度
     if (this.props.arrange.rotate) {
-      ['-moz-', '-ms', '-webkit-', ''].forEach((value) => {
-        styleObj[value + 'transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
+      ['Moz', 'Ms', 'Webkit', ''].forEach((value) => {
+        styleObj[value + 'Transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
       });
     }
 
@@ -112,11 +112,17 @@ class ImgFigure extends React.Component {
  *实现控制组件，创建对应的React.Component
  */
 class ControllerUnit extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this); //绑定this
+  }
+
   /*
    * ControllerUnit的点击处理函数
    */
   handleClick(e) {
 
+    //如果点击的是当前正在选中态的按钮，则翻转图片，否则将对应的图片居中
     if (this.props.arrange.isCenter) {
       this.props.inverse();
     } else {
@@ -128,8 +134,18 @@ class ControllerUnit extends React.Component {
   }
 
   render() {
+    var controllerUnitsClassName = 'controller-unit';
+
+    //如果对应的是居中的图片，显示控制按钮的居中态
+    if (this.props.arrange.isCenter) {
+      controllerUnitsClassName += ' is-center';
+      //如果同时对应的是翻转图片，显示控制按钮的翻转状态
+      if (this.props.arrange.isInverse) {
+        controllerUnitsClassName += ' is-inverse';
+      }
+    }
     return (
-      <span className="controller-unit" onClick={this.handleClick}></span>
+      <span className={controllerUnitsClassName} onClick={this.handleClick}></span>
     );
   }
 }
@@ -223,7 +239,7 @@ class AppComponent extends React.Component {
       vPosRangeX = vPosRange.x,
 
       imgsArrangeTopArr = [], // 用来存储分布在上片区域的图片的状态信息；会从整个图片数组中取0个或者1个放到上侧区域
-      topImgNum = Math.ceil(Math.random() * 2), //取一个或者不取（让他随机，因为上侧区域可以没有图片）
+      topImgNum = Math.floor(Math.random() * 2), //取一个或者不取（让他随机，因为上侧区域可以没有图片）
       topImgSpliceIndex = 0, //标记上侧区域的这个图片是从数组对象中的哪个位置拿出来的,先赋值为0
 
       //把最中间的图片给他做一个居中;就是从centerIndex剔除掉一个,拿到的就是centerIndex这个位置表现的图片信息，也就是中心图片的信息
@@ -384,8 +400,8 @@ class AppComponent extends React.Component {
       }
       //要给每个图片加上ref属性，不然会出现找不到舞台宽度的情况
       imgFigures.push(<ImgFigure data={value} key={index} ref={'imgFigure'+index}
-                                 arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
-      controllerUnits.push(<ControllerUnit/>);
+                                 arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)} />);
+      controllerUnits.push(<ControllerUnit key={index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)} />);
     });
 
     return (
